@@ -25,6 +25,12 @@
             android:name="com.byunlove.pc.quick_attendance.Attendance"
             android:label="출석체크">
         </activity>
+        <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:name="com.byunlove.pc.quick_attendance.Dreamy"
+            android:label="하영드리미">
+        </activity>
     </application>
 
 </manifest>

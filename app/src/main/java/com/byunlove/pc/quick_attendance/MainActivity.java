@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent (MainActivity.this, Attendance.class);
+                intent.putExtra("ID", "2014108172");
+                intent.putExtra("PW", "rkd7131973!");
                 startActivity(intent);
             }
         });

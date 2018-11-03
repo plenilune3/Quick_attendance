@@ -3,7 +3,6 @@ package com.byunlove.pc.quick_attendance;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +15,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -35,25 +31,15 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * Created by pc on 2018-09-05.
- */
-
-public class Attendance extends AppCompatActivity {
-    //private TextView textviewHtmlDocument;
+public class Dreamy extends AppCompatActivity {
     private WebView mWebView;
 
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        String id = getIntent().getStringExtra("ID");
-        String pw = getIntent().getStringExtra("PW");
-        Log.d("ID","ID : " + id);
-        Log.d("PW","PW : " + pw);
 
-        setContentView(R.layout.attendance_webview);
-        mWebView = (WebView) findViewById(R.id.smart_attendance);
-
+        setContentView(R.layout.dreamy);
+        mWebView = (WebView) findViewById(R.id.hayoung_dreamy);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
@@ -107,8 +93,6 @@ public class Attendance extends AppCompatActivity {
             }
         });
 
-        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
-        httpAsyncTask.execute(id, pw);
 
     }
 
@@ -124,8 +108,7 @@ public class Attendance extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-
-    private class HttpAsyncTask extends AsyncTask<String, Void, Void> {
+    private class HttpAsyncktask extends AsyncTask<String, Void, Void>{
 
         private HttpURLConnection conn;
 
@@ -253,17 +236,17 @@ public class Attendance extends AppCompatActivity {
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
                 conn.setRequestProperty("User-Agent",
                         "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) " +
-                        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Mobile Safari/537.36");
+                                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Mobile Safari/537.36");
 
                 OutputStream os = conn.getOutputStream();
                 os.write(body.getBytes("UTF-8")); // 출력 스트림에 출력.
                 os.flush(); // 출력 스트림을 플러시(비운다)하고 버퍼링 된 모든 출력 바이트를 강제 실행.
                 os.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
 
-                    Log.d("LOG",url+"로 HTTP 요청 전송");
-                    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
-                        Log.d("LOG", "HTTP_OK를 받지 못했습니다.");
-                        return null;
+                Log.d("LOG",url+"로 HTTP 요청 전송");
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
+                    Log.d("LOG", "HTTP_OK를 받지 못했습니다.");
+                    return null;
                 }
 
             } catch (MalformedURLException | ProtocolException exception) {
@@ -365,11 +348,11 @@ public class Attendance extends AppCompatActivity {
 
 
                 @Override
-                    public void checkClientTrusted(
+                public void checkClientTrusted(
 
-                            java.security.cert.X509Certificate[] chain,
+                        java.security.cert.X509Certificate[] chain,
 
-                            String authType)
+                        String authType)
 
                         throws java.security.cert.CertificateException {
 
@@ -413,6 +396,6 @@ public class Attendance extends AppCompatActivity {
         }
 
 
-    }
 
+    }
 }
