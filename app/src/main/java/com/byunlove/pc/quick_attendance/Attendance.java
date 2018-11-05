@@ -260,8 +260,11 @@ public class Attendance extends AppCompatActivity {
                 os.flush(); // 출력 스트림을 플러시(비운다)하고 버퍼링 된 모든 출력 바이트를 강제 실행.
                 os.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
 
-                    Log.d("LOG",url+"로 HTTP 요청 전송");
-                    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
+                Log.d("LOG",url+"로 HTTP 요청 전송");
+                String check = conn.getContentType().toString();
+
+                Log.d("로그인확인", check);
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
                         Log.d("LOG", "HTTP_OK를 받지 못했습니다.");
                         return null;
                 }

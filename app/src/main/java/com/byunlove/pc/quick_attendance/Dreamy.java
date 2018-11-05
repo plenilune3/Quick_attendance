@@ -1,6 +1,7 @@
 package com.byunlove.pc.quick_attendance;
 
 import android.content.DialogInterface;
+import android.net.http.SslError;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,12 +12,17 @@ import android.view.KeyEvent;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JsResult;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -33,15 +39,27 @@ import javax.net.ssl.X509TrustManager;
 
 public class Dreamy extends AppCompatActivity {
     private WebView mWebView;
+    private String result;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String id = getIntent().getStringExtra("ID");
+        String pw = getIntent().getStringExtra("PW");
+        Log.d("ID","ID : " + id);
+        Log.d("PW","PW : " + pw);
 
         setContentView(R.layout.dreamy);
         mWebView = (WebView) findViewById(R.id.hayoung_dreamy);
+
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setDisplayZoomControls(false);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -49,7 +67,15 @@ public class Dreamy extends AppCompatActivity {
                 view.loadUrl(url);
                 return true;
             }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                //매개변수로 액티비티를 넘기기...?
+                SSLAlertDialog dialog =  new SSLAlertDialog(handler, Dreamy.this);
+                dialog.show();
+            }
         });
+
 
         mWebView.setWebChromeClient(new WebChromeClient(){
             @Override
@@ -72,15 +98,15 @@ public class Dreamy extends AppCompatActivity {
             @Override
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
                 new AlertDialog.Builder(view.getContext())
-                        .setTitle("Confirm")
+                        .setTitle("확인")
                         .setMessage(message)
-                        .setPositiveButton("Yes",
+                        .setPositiveButton("예",
                                 new AlertDialog.OnClickListener(){
                                     public void onClick(DialogInterface dialog, int which) {
                                         result.confirm();
                                     }
                                 })
-                        .setNegativeButton("No",
+                        .setNegativeButton("아니오",
                                 new AlertDialog.OnClickListener(){
                                     public void onClick(DialogInterface dialog, int which) {
                                         result.cancel();
@@ -93,6 +119,8 @@ public class Dreamy extends AppCompatActivity {
             }
         });
 
+        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
+        httpAsyncTask.execute(id, pw);
 
     }
 
@@ -108,7 +136,8 @@ public class Dreamy extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private class HttpAsyncktask extends AsyncTask<String, Void, Void>{
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, Void>{
 
         private HttpURLConnection conn;
 
@@ -116,7 +145,8 @@ public class Dreamy extends AppCompatActivity {
         private List<String> cookies;
         private String[] cookies_str;
 
-        private String url_Attendance = "https://elearning.jejunu.ac.kr/MSmartatt.do?cmd=viewAttendCourseList";
+
+        private String url_home = "https://dreamy.jejunu.ac.kr/frame/main.do";
 
         @Override
         protected void onPreExecute() {
@@ -128,11 +158,11 @@ public class Dreamy extends AppCompatActivity {
 
             Log.d("ID","ID : " + params[0]);
             Log.d("PW","PW : " + params[1]);
-            String body = "cmd=loginUser&userDTO.userId=" + params[0] + "&userDTO.password=" + params[1] + "&userDTO.localeKey=ko";
+            String body = "tmpu=MjAxNDEwODE3Mg==&tmpw=cmtkNzEzMTk3MyE=&mobile=&app=&z=Y&userid=&password=";
 
             try {
 
-                URL url = new URL("https://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage");
+                URL url = new URL("https://dreamy.jejunu.ac.kr/frame/index.do");
 
                 trustAllHosts();
 
@@ -156,6 +186,24 @@ public class Dreamy extends AppCompatActivity {
                 conn.setDoInput(true); // 읽기모드 지정
                 conn.setUseCaches(false); // 캐싱데이터를 받을지 안받을지
                 conn.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
+
+//                InputStream is = conn.getInputStream(); //input스트림 개방
+//
+//                StringBuilder builder = new StringBuilder(); //문자열을 담기 위한 객체
+//
+//
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+//
+//
+//                // 출력물의 라인과 그 합에 대한 변수.
+//                String line;
+//                // 라인을 받아와 합친다.
+//
+//                while ((line = reader.readLine()) != null){
+//                    builder.append(line + "\n ");
+//                }
+//
+//                result = builder.toString();
 
                 cookies = conn.getHeaderFields().get("Set-Cookie");
                 cookies_str = cookies.toArray(new String[cookies.size()]);
@@ -195,7 +243,7 @@ public class Dreamy extends AppCompatActivity {
 
             try{
 
-                URL url = new URL("https://elearning.jejunu.ac.kr/MUser.do");
+                URL url = new URL("https://dreamy.jejunu.ac.kr/frame/sysUser.do?next=");
 
                 trustAllHosts();
 
@@ -213,7 +261,6 @@ public class Dreamy extends AppCompatActivity {
 
                 });
 
-
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST"); // POST방식 통신
                 conn.setDoOutput(true); // 쓰기모드 지정
@@ -223,16 +270,16 @@ public class Dreamy extends AppCompatActivity {
 
                 /*Request Header*/
                 conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-                conn.setRequestProperty("Accept-Encoding", "gzip,deflate");
+                conn.setRequestProperty("Accept-Encoding", "gzip,deflate,br");
                 conn.setRequestProperty("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7");
                 conn.setRequestProperty("Cache-Control", "max-age=0");
                 conn.setRequestProperty("Cookie", cookie);
                 conn.setRequestProperty("Connection", "keep-alive");
                 //conn.setRequestProperty("Content-Length", "91");
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestProperty("Host", "elearning.jejunu.ac.kr");
-                conn.setRequestProperty("Origin", "http://elearning.jejunu.ac.kr");
-                conn.setRequestProperty("Referer", "http://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage");
+                conn.setRequestProperty("Host", "dreamy.jejunu.ac.kr");
+                conn.setRequestProperty("Origin", "https://dreamy.jejunu.ac.kr");
+                conn.setRequestProperty("Referer", "https://dreamy.jejunu.ac.kr/frame/index.do?dummy=&loginerror=1&next=");
                 conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
                 conn.setRequestProperty("User-Agent",
                         "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) " +
@@ -258,66 +305,11 @@ public class Dreamy extends AppCompatActivity {
             }
 
 
-            /*
-                웹뷰말고 다른방법으로 구현
-            */
-//            try{
-//
-//                URL url = new URL("https://elearning.jejunu.ac.kr/MSmartatt.do?cmd=viewAttendCourseList");
-//
-//                trustAllHosts();
-//
-//                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-//
-//                httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-//
-//                    @Override
-//
-//                    public boolean verify(String s, SSLSession sslSession) {
-//
-//                        return true;
-//
-//                    }
-//
-//                });
-//
-//                conn = (HttpURLConnection) url.openConnection();
-//                conn.setRequestMethod("POST"); // POST방식 통신
-//                conn.setDoOutput(true); // 쓰기모드 지정
-//                conn.setDoInput(true); // 읽기모드 지정
-//                conn.setUseCaches(false); // 캐싱데이터를 받을지 안받을지
-//                conn.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
-//                conn.setRequestProperty("Cookie", cookie);
-//
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//
-//
-//                Log.d("@URL", url_Attendance.toString());
-//                // 출력물의 라인과 그 합에 대한 변수.
-//                String line;
-//                // 라인을 받아와 합친다.
-//
-//                while ((line = reader.readLine()) != null){
-//                    result += line + "\n";
-//                }
-//
-//            } catch (MalformedURLException | ProtocolException exception) {
-//                exception.printStackTrace();
-//            } catch (IOException io) {
-//                io.printStackTrace();
-//            } finally {
-//                conn.disconnect();
-//            }
-
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            //System.out.println(aVoid);
-            //textviewHtmlDocument.setText(result.toString());
-            //Toast.makeText(Attendance.this, "전송 후 결과 받음", 0).show();
             CookieSyncManager.createInstance(mWebView.getContext());
             CookieManager cookieManager = CookieManager.getInstance();
             cookieManager.setAcceptCookie(true);
@@ -326,11 +318,12 @@ public class Dreamy extends AppCompatActivity {
 
             for (String cookie : cookies) {
                 Log.d("@COOKIE", cookie);
-                cookieManager.setCookie(url_Attendance, cookie); //
+                cookieManager.setCookie(url_home, cookie); //
             }
 
             CookieSyncManager.getInstance().sync();
-            mWebView.loadUrl(url_Attendance);
+            mWebView.loadUrl(url_home);
+//            mWebView.loadUrl("https://dreamy.jejunu.ac.kr/frame/index.do");
 
         }
 
@@ -348,11 +341,7 @@ public class Dreamy extends AppCompatActivity {
 
 
                 @Override
-                public void checkClientTrusted(
-
-                        java.security.cert.X509Certificate[] chain,
-
-                        String authType)
+                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
 
                         throws java.security.cert.CertificateException {
 
@@ -364,9 +353,7 @@ public class Dreamy extends AppCompatActivity {
                 @Override
                 public void checkServerTrusted(
 
-                        java.security.cert.X509Certificate[] chain,
-
-                        String authType)
+                        java.security.cert.X509Certificate[] chain, String authType)
 
                         throws java.security.cert.CertificateException {
 
@@ -384,9 +371,7 @@ public class Dreamy extends AppCompatActivity {
 
                 sc.init(null, trustAllCerts, new java.security.SecureRandom());
 
-                HttpsURLConnection
-
-                        .setDefaultSSLSocketFactory(sc.getSocketFactory());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             } catch (Exception e) {
 
