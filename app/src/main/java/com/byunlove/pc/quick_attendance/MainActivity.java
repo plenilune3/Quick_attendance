@@ -30,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         autoLogin = (CheckBox) findViewById(R.id.checkBox);
         loginBotton = (Button) findViewById(R.id.loginButton);
         Dreamy = (Button) findViewById(R.id.dreamy);
-        //인텐트로 아이디 비밀번호 넘겨서 처리해야함
-        //자동로그인(SharedPreference) 구현해보기
 
 
         loginBotton.setOnClickListener(new View.OnClickListener() {

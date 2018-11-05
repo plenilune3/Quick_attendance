@@ -17,12 +17,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -39,7 +35,6 @@ import javax.net.ssl.X509TrustManager;
 
 public class Dreamy extends AppCompatActivity {
     private WebView mWebView;
-    private String result;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -169,15 +164,10 @@ public class Dreamy extends AppCompatActivity {
                 HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
                 httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-
                     @Override
-
                     public boolean verify(String s, SSLSession sslSession) {
-
                         return true;
-
                     }
-
                 });
 
                 conn = (HttpURLConnection) url.openConnection();
@@ -250,15 +240,10 @@ public class Dreamy extends AppCompatActivity {
                 HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
                 httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-
                     @Override
-
                     public boolean verify(String s, SSLSession sslSession) {
-
                         return true;
-
                     }
-
                 });
 
                 conn = (HttpURLConnection) url.openConnection();
@@ -303,8 +288,6 @@ public class Dreamy extends AppCompatActivity {
             } finally {
                 conn.disconnect();
             }
-
-
             return null;
         }
 
@@ -344,11 +327,8 @@ public class Dreamy extends AppCompatActivity {
                 public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
 
                         throws java.security.cert.CertificateException {
-
                     // TODO Auto-generated method stub
-
                 }
-
 
                 @Override
                 public void checkServerTrusted(
@@ -356,9 +336,7 @@ public class Dreamy extends AppCompatActivity {
                         java.security.cert.X509Certificate[] chain, String authType)
 
                         throws java.security.cert.CertificateException {
-
                     // TODO Auto-generated method stub
-
                 }
 
             }};
@@ -366,21 +344,12 @@ public class Dreamy extends AppCompatActivity {
             // Install the all-trusting trust manager
 
             try {
-
                 SSLContext sc = SSLContext.getInstance("TLS");
-
                 sc.init(null, trustAllCerts, new java.security.SecureRandom());
-
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
             } catch (Exception e) {
-
                 e.printStackTrace();
-
             }
         }
-
-
-
     }
 }
