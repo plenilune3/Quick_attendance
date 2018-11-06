@@ -19,7 +19,6 @@ public class SSLAlertDialog {
                 "계속하시겠습니까?";
 
         if(errorHandler == null || activity == null ) return;
-
         this.handler = errorHandler;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -41,9 +40,8 @@ public class SSLAlertDialog {
         dialog = builder.create();
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
+
     }
 
-    public void show(){
-        dialog.show();
-    }
+    public void show(){ dialog.show(); }
 }

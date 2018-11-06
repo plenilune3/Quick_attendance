@@ -30,64 +30,88 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
-        editor = pref.edit();
-
         idInput = (EditText) findViewById(R.id.idInput);
         pwInput = (EditText) findViewById(R.id.passwordInput);
         autoLogin = (CheckBox) findViewById(R.id.checkBox);
         loginButton = (Button) findViewById(R.id.loginButton);
         dreamyButton = (Button) findViewById(R.id.dreamy);
 
+        pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
+        editor = pref.edit();
+
         autoCheck = pref.getBoolean("autoLogin", false);
 
         if(autoCheck){
+
             idString = pref.getString("id", null);
             pwString = pref.getString("pw", null);
 
             if(getAutoLogin(idString, pwString)){
+
                 Intent intent = new Intent (MainActivity.this, Attendance.class);
                 intent.putExtra("ID", idString);
                 intent.putExtra("PW", pwString);
                 startActivity(intent);
+
             }
+
         }
 
-
         loginButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 
                 if(isOnline()){
+
                     idString = idInput.getText().toString();
                     pwString = pwInput.getText().toString();
 
                     if(setAutoLogin(idString, pwString)){
+
                         Intent intent = new Intent (MainActivity.this, Attendance.class);
                         intent.putExtra("ID", idString);
                         intent.putExtra("PW", pwString);
                         startActivity(intent);
+
                     }
+
                 }
+
                 else{ Toast.makeText(MainActivity.this, "인터넷 연결을 확인하세요", Toast.LENGTH_SHORT).show(); }
+
             }
+
         });
 
         dreamyButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+
                 if(isOnline()){
-                    Intent intent = new Intent (MainActivity.this, Dreamy.class);
-                    intent.putExtra("ID", "2014108172");
-                    intent.putExtra("PW", "rkd7131973!");
-                    startActivity(intent);
+
+                    idString = idInput.getText().toString();
+                    pwString = pwInput.getText().toString();
+
+                    if(setAutoLogin(idString, pwString)){
+
+                        Intent intent = new Intent (MainActivity.this, Attendance.class);
+                        intent.putExtra("ID", idString);
+                        intent.putExtra("PW", pwString);
+                        startActivity(intent);
+
+                    }
+
                 }
+
                 else{ Toast.makeText(MainActivity.this, "인터넷 연결을 확인하세요", Toast.LENGTH_SHORT).show(); }
+
             }
+
         });
 
   }
@@ -95,36 +119,52 @@ public class MainActivity extends AppCompatActivity {
   private Boolean getAutoLogin(String id, String pw){
 
       if(loginValidation(id, pw)){
+
           idInput.setText(id);
           pwInput.setText(pw);
           autoLogin.setChecked(true);
           return true;
+
       }
+
       else{
+
           Toast.makeText(MainActivity.this, "아이디와 패스워드를 입력하세요", Toast.LENGTH_SHORT).show();
           return false;
+
       }
 
   }
   private Boolean setAutoLogin(String id, String pw){
 
       if(loginValidation(id,pw)){
+
           Log.d("@loginValidation", "" + loginValidation(id, pw));
           if (autoLogin.isChecked()){
+
               editor.putBoolean("autoLogin", true);
               editor.putString("id", id);
               editor.putString("pw", pw);
               editor.apply();
+
           }
+
           else{
+
               editor.clear();
               editor.apply();
+
           }
+
           return true;
+
       }
+
       else{
+
           Toast.makeText(MainActivity.this, "아이디와 패스워드를 입력하세요", Toast.LENGTH_SHORT).show();
           return false;
+
       }
 
   }
@@ -132,10 +172,13 @@ public class MainActivity extends AppCompatActivity {
   private Boolean loginValidation(String id, String pw){
 
         if (!id.isEmpty() && !pw.isEmpty()){
+
             Log.d("@idString", id);
             Log.d("@pwString", pw);
             return true;
+
         }
+
         else{ return false; }
 
   }
@@ -149,4 +192,5 @@ public class MainActivity extends AppCompatActivity {
       else{ return false; }
 
   }
+
 }

@@ -46,70 +46,37 @@ public class Attendance extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        String id = getIntent().getStringExtra("ID");
-        String pw = getIntent().getStringExtra("PW");
-        Log.d("@ID","ID : " + id);
-        Log.d("@PW","PW : " + pw);
-
         setContentView(R.layout.attendance_webview);
         mWebView = (WebView) findViewById(R.id.smart_attendance);
 
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        String id = getIntent().getStringExtra("ID");
+        String pw = getIntent().getStringExtra("PW");
+        String url_Home = "https://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage";
+        String url_Login = "https://elearning.jejunu.ac.kr/MUser.do";
+        String url_Destination = "https://elearning.jejunu.ac.kr/MSmartatt.do?cmd=viewAttendCourseList";
+        String host = "elearning.jejunu.ac.kr";
+        String referer = "http://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage";
+        String origin = "http://elearning.jejunu.ac.kr";
+        String body = "cmd=loginUser&userDTO.userId=" + id + "&userDTO.password=" + pw + "&userDTO.localeKey=ko";
 
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-        });
+        Log.d("@ID","ID : " + id);
+        Log.d("@PW","PW : " + pw);
 
-        mWebView.setWebChromeClient(new WebChromeClient(){
+        WebViewSettings webViewSettings = new WebViewSettings(mWebView);
+        webViewSettings.setWebSettings();
+        webViewSettings.setWebChromeClient();
+        webViewSettings.setWebViewClient(this);
 
-            @Override
-            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-                new AlertDialog.Builder(view.getContext())
-                        .setTitle("Alert")
-                        .setMessage(message)
-                        .setPositiveButton(android.R.string.ok,
-                                new AlertDialog.OnClickListener(){
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        result.confirm();
-                                    }
-                                })
-                        .setCancelable(false)
-                        .create()
-                        .show();
-                return true;
-            }
+        HttpsConnection httpsConnection = new HttpsConnection(mWebView, Attendance.this);
+        httpsConnection.setUrl_Home(url_Home);
+        httpsConnection.setUrl_Login(url_Login);
+        httpsConnection.setUrl_Destination(url_Destination);
+        httpsConnection.setHost(host);
+        httpsConnection.setReferer(referer);
+        httpsConnection.setOrigin(origin);
+        httpsConnection.setBody(body);
+        httpsConnection.execute(id, pw);
 
-            @Override
-            public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
-                new AlertDialog.Builder(view.getContext())
-                        .setTitle("Confirm")
-                        .setMessage(message)
-                        .setPositiveButton("Yes",
-                                new AlertDialog.OnClickListener(){
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        result.confirm();
-                                    }
-                                })
-                        .setNegativeButton("No",
-                                new AlertDialog.OnClickListener(){
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        result.cancel();
-                                    }
-                                })
-                        .setCancelable(false)
-                        .create()
-                        .show();
-                return true;
-            }
-        });
-
-        HttpAsyncTask httpAsyncTask = new HttpAsyncTask();
-        httpAsyncTask.execute(id, pw);
     }
 
     @Override
@@ -122,249 +89,7 @@ public class Attendance extends AppCompatActivity {
             }
         }
         return super.onKeyDown(keyCode, event);
-    }
 
-
-    private class HttpAsyncTask extends AsyncTask<String, Void, Void> {
-
-        private HttpURLConnection conn;
-
-        private String cookie;
-        private List<String> cookies;
-        private String[] cookies_str;
-
-        private String loginCheck;
-
-        private String url_Attendance = "https://elearning.jejunu.ac.kr/MSmartatt.do?cmd=viewAttendCourseList";
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            Log.d("ID","ID : " + params[0]);
-            Log.d("PW","PW : " + params[1]);
-            String body = "cmd=loginUser&userDTO.userId=" + params[0] + "&userDTO.password=" + params[1] + "&userDTO.localeKey=ko";
-
-            try {
-
-                URL url = new URL("https://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage");
-
-                trustAllHosts();
-
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-
-                httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-
-                    @Override
-                    public boolean verify(String s, SSLSession sslSession) {
-
-                        return true;
-
-                    }
-
-                });
-
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST"); // POST방식 통신
-                conn.setDoOutput(true); // 쓰기모드 지정
-                conn.setDoInput(true); // 읽기모드 지정
-                conn.setUseCaches(false); // 캐싱데이터를 받을지 안받을지
-                conn.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
-
-                cookies = conn.getHeaderFields().get("Set-Cookie");
-                cookies_str = cookies.toArray(new String[cookies.size()]); //List를 문자열 배열로 변환
-
-                if (cookies != null) { // List배열의 쿠키값 확인
-                    for (String cookie : cookies) {
-                        Log.d("@COOKIE", cookie.split(";\\s*")[0]);
-                    }
-                }
-
-                if (cookies_str != null){ // 문자열 배열을 문자열로 변환
-                    for (int i = 0; i < cookies_str.length; i++){
-                        cookie += cookies_str[i].toString().split(";\\s*")[0] + "; ";
-                    }
-                    cookie=cookie.substring(0, cookie.length()-1);
-                }
-
-                Log.d("@COOKIE_STRING", cookie);
-
-                //LTE 환경에서는 SSCSID쿠키를 받아오지만
-                //WIFI 환경에서는 받아오지 않음
-                //왜일까?
-                //일단 어거지로 해결해놓음 WIFI, LTE 모두 문제없음
-
-            } catch (MalformedURLException | ProtocolException exception) {
-                exception.printStackTrace();
-            } catch (IOException io) {
-                io.printStackTrace();
-            } finally {
-                conn.disconnect();
-            }
-
-            try{
-                URL url = new URL("https://elearning.jejunu.ac.kr/MUser.do");
-
-                trustAllHosts();
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-
-                    @Override
-                    public boolean verify(String s, SSLSession sslSession) { return true;
-
-                    }
-
-                });
-
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST"); // POST방식 통신
-                conn.setDoOutput(true); // 쓰기모드 지정
-                conn.setDoInput(true); // 읽기모드 지정
-                conn.setUseCaches(false); // 캐싱데이터를 받을지 안받을지
-                conn.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
-
-                /*Request Header*/
-                conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-                conn.setRequestProperty("Accept-Encoding", "gzip,deflate");
-                conn.setRequestProperty("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7");
-                conn.setRequestProperty("Cache-Control", "max-age=0");
-                conn.setRequestProperty("Cookie", cookie);
-                conn.setRequestProperty("Connection", "keep-alive");
-                //conn.setRequestProperty("Content-Length", "91");
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestProperty("Host", "elearning.jejunu.ac.kr");
-                conn.setRequestProperty("Origin", "http://elearning.jejunu.ac.kr");
-                conn.setRequestProperty("Referer", "http://elearning.jejunu.ac.kr/MMain.do?cmd=viewIndexPage");
-                conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
-                conn.setRequestProperty("User-Agent",
-                        "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) " +
-                        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Mobile Safari/537.36");
-
-                OutputStream os = conn.getOutputStream();
-                os.write(body.getBytes("UTF-8")); // 출력 스트림에 출력.
-                os.flush(); // 출력 스트림을 플러시(비운다)하고 버퍼링 된 모든 출력 바이트를 강제 실행.
-                os.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제.
-
-                Log.d("LOG",url+"로 HTTP 요청 전송");
-                long temp = conn.getExpiration();
-                loginCheck = "" + temp;
-                Log.d("로그인확인", loginCheck);
-                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
-                        Log.d("LOG", "HTTP_OK를 받지 못했습니다.");
-                        return null;
-                }
-
-            } catch (MalformedURLException | ProtocolException exception) {
-                exception.printStackTrace();
-            } catch (IOException io) {
-                io.printStackTrace();
-            } finally {
-                conn.disconnect();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-            if (loginCheck.equals("0")){
-                CookieSyncManager.createInstance(mWebView.getContext());
-                CookieManager cookieManager = CookieManager.getInstance();
-                cookieManager.setAcceptCookie(true);
-                cookieManager.removeAllCookie();
-
-                for (String cookie : cookies) {
-                    Log.d("@COOKIE", cookie);
-                    cookieManager.setCookie(url_Attendance, cookie); //
-                }
-
-                CookieSyncManager.getInstance().sync();
-                mWebView.loadUrl(url_Attendance);
-            }
-            else {
-                AlertDialog dialog = null;
-                String loginFailedMassege = "로그인에 실패하셨습니다. \n다시 로그인 해주세요.";
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(Attendance.this);
-                builder.setMessage(loginFailedMassege);
-                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                });
-
-                dialog = builder.create();
-                dialog.setCancelable(false);
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.show();
-            }
-        }
-    }
-
-    private void trustAllHosts() {
-
-        // Create a trust manager that does not validate certificate chains
-
-        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-
-                return new java.security.cert.X509Certificate[]{};
-
-            }
-
-
-            @Override
-            public void checkClientTrusted(
-
-                    java.security.cert.X509Certificate[] chain,
-
-                    String authType)
-
-                    throws java.security.cert.CertificateException {
-
-                // TODO Auto-generated method stub
-
-            }
-
-
-            @Override
-            public void checkServerTrusted(
-
-                    java.security.cert.X509Certificate[] chain,
-
-                    String authType)
-
-                    throws java.security.cert.CertificateException {
-
-                // TODO Auto-generated method stub
-
-            }
-
-        }};
-
-        // Install the all-trusting trust manager
-
-        try {
-
-            SSLContext sc = SSLContext.getInstance("TLS");
-
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            HttpsURLConnection
-
-                    .setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
     }
 
 }
