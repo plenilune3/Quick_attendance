@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
         if(autoCheck){
 
+            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
             idString = pref.getString("id", null);
             pwString = pref.getString("pw", null);
 
@@ -57,10 +60,16 @@ public class MainActivity extends AppCompatActivity {
                 pwInput.setText(pwString);
                 autoLogin.setChecked(true);
 
-                Intent intent = new Intent (MainActivity.this, Attendance.class);
-                intent.putExtra("ID", idString);
-                intent.putExtra("PW", pwString);
-                startActivity(intent);
+                if(login.isOnline(networkInfo)){
+
+                    Intent intent = new Intent (MainActivity.this, Attendance.class);
+                    intent.putExtra("ID", idString);
+                    intent.putExtra("PW", pwString);
+                    startActivity(intent);
+
+                }
+
+                else{ Toast.makeText(MainActivity.this, "인터넷 연결을 확인하세요", Toast.LENGTH_SHORT).show(); }
 
             }
 
