@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         idInput = (EditText) findViewById(R.id.idInput);
         pwInput = (EditText) findViewById(R.id.passwordInput);
         autoLogin = (CheckBox) findViewById(R.id.checkBox);
-        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton = (Button) findViewById(R.id.Attendance);
         dreamyButton = (Button) findViewById(R.id.dreamy);
 
         pref = getSharedPreferences("pref", Activity.MODE_PRIVATE);
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if(setAutoLogin(idString, pwString)){
 
-                        Intent intent = new Intent (MainActivity.this, Attendance.class);
+                        Intent intent = new Intent (MainActivity.this, Dreamy.class);
                         intent.putExtra("ID", idString);
                         intent.putExtra("PW", pwString);
                         startActivity(intent);

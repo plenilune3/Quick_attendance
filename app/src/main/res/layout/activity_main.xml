@@ -8,12 +8,13 @@
     tools:context="com.byunlove.pc.quick_attendance.MainActivity">
 
     <EditText
+        android:id="@+id/idInput"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:id="@+id/idInput"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:hint="아이디를 입력하세요"
-        android:layout_marginTop="151dp" />
+        android:layout_marginTop="80dp"
+        android:hint="아이디를 입력하세요" />
 
     <EditText
         android:layout_width="300dp"
@@ -24,8 +25,17 @@
         android:inputType="textPassword"
         android:layout_below="@+id/idInput" />
 
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Attendance"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="자동 로그인" />
+
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/Attendance"
         android:layout_width="150dp"
         android:layout_height="55dp"
         android:layout_alignEnd="@+id/passwordInput"
@@ -34,28 +44,22 @@
         android:layout_alignStart="@+id/passwordInput"
         android:layout_below="@+id/passwordInput"
         android:layout_marginTop="20dp"
-        android:background="@color/button"
+        android:background="@color/Attendance"
         android:text="스마트 출석"
         android:textSize="25sp"
         android:textColor="@android:color/white"
         android:textAllCaps="false" />
 
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/loginButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="자동 로그인" />
-
     <Button
         android:id="@+id/dreamy"
-        android:layout_width="wrap_content"
+        android:layout_width="230dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="56dp"
-        android:text="Button" />
+        android:layout_below="@+id/checkBox"
+        android:layout_marginTop="20dp"
+        android:background="@color/Dreamy"
+        android:text="하영드리미 로그인"
+        android:textColor="@android:color/white"
+        android:textSize="25sp" />
 
 </RelativeLayout>

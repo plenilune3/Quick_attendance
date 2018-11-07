@@ -31,13 +31,13 @@ public class HttpsConnection {
         this.activity = activity;
     }
 
-    String url_Home, url_Login, url_Destination, host, referer, origin, body;
+    private String url_Home, url_Login, url_Destination, host, referer, origin, body;
 
     public void setUrl_Home(String url_Home) { this.url_Home = url_Home; }
     public void setUrl_Login(String url_Login) { this.url_Login = url_Login; }
     public void setUrl_Destination(String url_Destination) { this.url_Destination = url_Destination; }
     public void setHost(String host) { this.host = host; }
-    public void setReferer(String refer) { this.referer = refer; }
+    public void setReferer(String referer) { this.referer = referer; }
     public void setOrigin(String origin) { this.origin = origin; }
     public void setBody(String body) { this.body = body; }
 
@@ -117,6 +117,7 @@ public class HttpsConnection {
                 os.close(); // 출력 스트림을 닫고 모든 시스템 자원을 해제
 
                 Log.d("LOG",url+"로 HTTP 요청 전송");
+
                 if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //이때 요청이 보내짐.
 
                     Log.d("LOG", "HTTP_OK를 받지 못했습니다.");
@@ -218,11 +219,10 @@ public class HttpsConnection {
 
         private boolean LoginSuccess() {
 
-            long temp = conn.getExpiration();
-            String loginCheck = "" + temp;
-            Log.d("로그인확인", loginCheck);
+            String loginCheck = conn.getHeaderField(2);
+            Log.d("로그인확인",loginCheck);
 
-            return loginCheck.equals("0");
+            return loginCheck.equals("text/html;charset=UTF-8");
 
         }
 

@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#273343</color>
     <color name="colorAccent">#273343</color>
     <color name="backGround">#F5F4E9</color>
-    <color name="button">#F76043</color>
+    <color name="Attendance">#F76043</color>
+    <color name="Dreamy">#2D68AC</color>
 </resources>
