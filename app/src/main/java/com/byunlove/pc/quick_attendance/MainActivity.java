@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    Login login = new Login();
+
     EditText idInput, pwInput;
     CheckBox autoLogin;
     Button loginButton;
@@ -27,12 +29,15 @@ public class MainActivity extends AppCompatActivity {
     String idString, pwString;
     Boolean autoCheck;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         idInput = (EditText) findViewById(R.id.idInput);
         pwInput = (EditText) findViewById(R.id.passwordInput);
         autoLogin = (CheckBox) findViewById(R.id.checkBox);
@@ -49,7 +54,11 @@ public class MainActivity extends AppCompatActivity {
             idString = pref.getString("id", null);
             pwString = pref.getString("pw", null);
 
-            if(getAutoLogin(idString, pwString)){
+            if(login.getAutoLogin(idString, pwString,MainActivity.this)){
+
+                idInput.setText(idString);
+                pwInput.setText(pwString);
+                autoLogin.setChecked(true);
 
                 Intent intent = new Intent (MainActivity.this, Attendance.class);
                 intent.putExtra("ID", idString);
@@ -65,12 +74,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(isOnline()){
+                if(login.isOnline(networkInfo)){
 
                     idString = idInput.getText().toString();
                     pwString = pwInput.getText().toString();
 
-                    if(setAutoLogin(idString, pwString)){
+                    if(login.setAutoLogin(idString, pwString, autoLogin, editor, MainActivity.this)){
 
                         Intent intent = new Intent (MainActivity.this, Attendance.class);
                         intent.putExtra("ID", idString);
@@ -92,12 +101,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(isOnline()){
+                if(login.isOnline(networkInfo)){
 
                     idString = idInput.getText().toString();
                     pwString = pwInput.getText().toString();
 
-                    if(setAutoLogin(idString, pwString)){
+                    if(login.setAutoLogin(idString, pwString, autoLogin, editor, MainActivity.this)){
 
                         Intent intent = new Intent (MainActivity.this, Dreamy.class);
                         intent.putExtra("ID", idString);
@@ -113,83 +122,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
-  }
-
-  private Boolean getAutoLogin(String id, String pw){
-
-      if(loginValidation(id, pw)){
-
-          idInput.setText(id);
-          pwInput.setText(pw);
-          autoLogin.setChecked(true);
-          return true;
-
-      }
-
-      else{
-
-          Toast.makeText(MainActivity.this, "아이디와 패스워드를 입력하세요", Toast.LENGTH_SHORT).show();
-          return false;
-
-      }
-
-  }
-  private Boolean setAutoLogin(String id, String pw){
-
-      if(loginValidation(id,pw)){
-
-          Log.d("@loginValidation", "" + loginValidation(id, pw));
-          if (autoLogin.isChecked()){
-
-              editor.putBoolean("autoLogin", true);
-              editor.putString("id", id);
-              editor.putString("pw", pw);
-              editor.apply();
-
-          }
-
-          else{
-
-              editor.clear();
-              editor.apply();
-
-          }
-
-          return true;
-
-      }
-
-      else{
-
-          Toast.makeText(MainActivity.this, "아이디와 패스워드를 입력하세요", Toast.LENGTH_SHORT).show();
-          return false;
-
-      }
-
-  }
-
-  private Boolean loginValidation(String id, String pw){
-
-        if (!id.isEmpty() && !pw.isEmpty()){
-
-            Log.d("@idString", id);
-            Log.d("@pwString", pw);
-            return true;
-
-        }
-
-        else{ return false; }
-
-  }
-
-  private Boolean isOnline(){
-
-      ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-      NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-      if(networkInfo != null && networkInfo.isConnected()){ return true; }
-      else{ return false; }
 
   }
 

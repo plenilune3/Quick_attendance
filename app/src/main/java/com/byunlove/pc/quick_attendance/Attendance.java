@@ -83,11 +83,16 @@ public class Attendance extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+
             if (mWebView.canGoBack()) {
+
                 mWebView.goBack();
                 return false;
+
             }
+
         }
+
         return super.onKeyDown(keyCode, event);
 
     }
